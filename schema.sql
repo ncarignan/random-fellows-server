@@ -1,10 +1,13 @@
+CREATE DATABASE random_fellows;
+\c random_fellows;
+
 DROP TABLE canvas_keys;
 DROP TABLE authentication;
 
   CREATE TABLE IF NOT EXISTS authentication(
     user_id SERIAL PRIMARY KEY, 
     name varchar(255) NOT NULL,
-    passhash varchar(255) NOT NULL);
+    password varchar(255) NOT NULL);
 
 
   CREATE TABLE IF NOT EXISTS canvas_keys(
