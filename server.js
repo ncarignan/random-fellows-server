@@ -28,7 +28,7 @@ app.post('/canvas_key', save_canvas_key);
 app.post('/canvas', make_chained_canvas_requests); // I am imagining a final custom form with a drop down of every canvas request, similar format to postman, with fillables for any data the front end needs, the server handles anything else
 
 app.get('/course/:id', (req, res) => {
-  return superagent.get(`${CANVAS_API_URL}/api/v1/courses`)
+  return superagent.get(`${CANVAS_API_URL}/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments`)
     .set('Authorization', `Bearer ${process.env.CANVAS_API_KEY}`)
     .then(result => res.send(result.body))
 })
@@ -120,7 +120,8 @@ async function handle_login(req, res){
   } else if(user_match.rows.length > 0){
     return res.status(400).send({message: 'not logged in'})
   } else {
-    const user_id = await client.query(`INSERT INTO authentication (name, password) values ($1, $2) RETURNING user_id`, [req.body.name, req.body.password]);
+    const result = await client.query(`INSERT INTO authentication (name, password) values ($1, $2) RETURNING user_id`, [req.body.name, req.body.password]);
+    const {user_id}  =result.rows[0];
     const token = jwt.sign({ name: req.body.name, password: req.body.password, user_id }, process.env.JWT_SECRET)
     return res.send({token, new_user: true});
   }
@@ -131,6 +132,7 @@ async function save_canvas_key(req, res){
   const {canvas_api_key} = body;
   let token = headers['x-access-token'];
   token = jwt.verify(token, process.env.JWT_SECRET);
+  console.log(token);
 
   const UPDATE = `
     UPDATE canvas_keys 
