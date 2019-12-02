@@ -46,7 +46,7 @@ async function getStudents(req, res) {
   const { rows } = await client.query(`SELECT canvas_api_key FROM canvas_keys WHERE id=$1`, [token.user_id]);
   if (!rows[0]) return res.sendStatus(400);
 
-  await superagent.get(`${CANVAS_API_URL}/api/v1/courses/${params.course_id}/users?enrollment_type=student&per_page=500`) 
+  await superagent.get(`${CANVAS_API_URL}/api/v1/courses/${params.course_id}/users?enrollment_type=student&per_page=500&include%5B%5D=avatar_url`) 
     .set('Authorization', `Bearer ${rows[0].canvas_api_key}`)
         .then(result => res.send(result.body))
         // .then(result => result.body)
